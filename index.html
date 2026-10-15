@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>сборка — студия разработки</title>
+<meta name="description" content="Собираем сайты, приложения для iOS и Android и Telegram-ботов. Цена и срок — до начала работ.">
+<meta property="og:title" content="сборка — студия разработки">
+<meta property="og:description" content="Сайты, приложения для iOS и Android, Telegram-боты. Цена и срок — до начала работ.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#f3f2ee">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!--
+  НАСТРОЙКА:
+  - Telegram: замени "your_telegram" на свой username (встречается в TG_USERNAME ниже и в ссылках);
+  - email: замени "hello@example.com".
+-->
+<style>
+  :root {
+    --paper: #f3f2ee;
+    --paper-2: #e8e6df;
+    --ink: #111111;
+    --ink-2: #55534d;
+    --line: #111111;
+    --hair: rgba(17,17,17,.14);
+    --accent: #ff4f1f;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; overflow-x: hidden; }
+  @supports (overflow: clip) { html, body { overflow-x: clip; } }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.5 "Onest", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  ::selection { background: var(--accent); color: var(--ink); }
+  .wrap { padding: 0 16px; max-width: 1440px; margin: 0 auto; }
+  @media (min-width: 760px) { .wrap { padding: 0 32px; } }
+
+  /* ---------- Шапка ---------- */
+  header.top { position: fixed; inset: 0 0 auto 0; z-index: 30; transition: transform .35s ease, background .3s; }
+  header.top.solid { background: var(--paper); border-bottom: 1px solid var(--hair); }
+  header.top.hide { transform: translateY(-100%); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .mini-logo { font-weight: 500; font-size: 20px; letter-spacing: -.04em; text-decoration: none; opacity: 0; transition: opacity .3s; }
+  header.top.solid .mini-logo { opacity: 1; }
+  nav.links { display: flex; gap: 22px; font-size: 15px; }
+  nav.links a { text-decoration: none; position: relative; }
+  nav.links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .3s; }
+  nav.links a:hover::after { transform: scaleX(1); transform-origin: left; }
+  nav.links .hide-sm { display: none; }
+  @media (min-width: 760px) { nav.links .hide-sm { display: inline; } }
+
+  /* ---------- Кнопки ---------- */
+  .btn { display: inline-flex; align-items: center; gap: 12px; padding: 16px 22px; font: 500 16px/1 "Onest", sans-serif; text-decoration: none; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; transition: background .2s, color .2s; }
+  .btn:hover { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .btn .arr { display: inline-block; transition: transform .25s; }
+  .btn:hover .arr { transform: translate(3px, -3px); }
+
+  /* ---------- Первый экран ---------- */
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; padding-top: 70px; }
+  .wordmark { position: relative; margin: 0 0 0 -.04em; font-weight: 300; letter-spacing: -.075em; line-height: .78; font-size: 25.5vw; white-space: nowrap; user-select: none; }
+  @media (min-width: 1440px) { .wordmark { font-size: 360px; } }
+  .wordmark span { display: inline-block; transform: translateY(40%); opacity: 0; transition: transform 1s cubic-bezier(.2,.75,.2,1), opacity .6s; transition-delay: calc(var(--i) * 60ms); }
+  .loaded .wordmark span { transform: none; opacity: 1; }
+  .tagline { display: flex; align-items: center; gap: 16px; margin-top: 28px; font-size: clamp(15px, 2vw, 26px); font-weight: 300; }
+  .tagline i { flex: 1; height: 1px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform 1.2s .5s cubic-bezier(.2,.75,.2,1); }
+  .loaded .tagline i { transform: none; }
+  .hero-bottom { margin-top: auto; display: grid; gap: 28px; padding: 48px 0 32px; align-items: end; position: relative; z-index: 3; }
+  @media (min-width: 900px) { .hero-bottom { grid-template-columns: 1fr auto; } }
+  .hero-bottom p { margin: 0 0 22px; font-size: clamp(18px, 1.7vw, 22px); max-width: 520px; line-height: 1.35; }
+  .status { font-size: 14px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+  .status b { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  /* Детали, которые можно перетаскивать */
+  .parts { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  .part { position: absolute; pointer-events: auto; cursor: grab; touch-action: none; opacity: 0; }
+  .loaded .part { opacity: 1; transition: opacity .6s 1s; }
+  .part:active { cursor: grabbing; }
+  .part svg { display: block; width: 100%; height: 100%; transition: transform .2s; }
+  .part.dragging svg { transform: scale(1.06); }
+  .hint { position: absolute; z-index: 3; font-size: 13px; color: var(--ink-2); pointer-events: none; transition: opacity .4s; background: var(--paper); padding: 2px 6px; }
+  .hint::before { content: "↖ "; }
+  @media (max-width: 760px) {
+    .part:nth-child(1) { top: 34% !important; left: 60% !important; }
+    .part:nth-child(2) { top: 46% !important; left: 10% !important; }
+    .part:nth-child(3) { top: 52% !important; left: 78% !important; }
+    .part:nth-child(4) { top: 60% !important; left: 44% !important; }
+    .hint { top: calc(34% + clamp(70px,11vw,170px) + 8px) !important; left: 52% !important; }
+  }
+
+  /* ---------- Секции ---------- */
+  section { padding: 96px 0; }
+  @media (min-width: 900px) { section { padding: 140px 0; } }
+  .head { display: grid; gap: 16px; align-items: end; border-top: 1px solid var(--line); padding-top: 18px; margin-bottom: 56px; }
+  @media (min-width: 900px) { .head { grid-template-columns: 1fr 1fr; } }
+  .head h2 { margin: 0; font-weight: 400; font-size: clamp(40px, 6vw, 88px); letter-spacing: -.045em; line-height: .95; }
+  .head p { margin: 0; color: var(--ink-2); max-width: 440px; font-size: 16px; }
+  @media (min-width: 900px) { .head p { justify-self: end; } }
+
+  .statement { font-weight: 300; font-size: clamp(28px, 4.6vw, 68px); line-height: 1.08; letter-spacing: -.04em; margin: 0; max-width: 1300px; }
+  .statement mark { background: none; color: inherit; background-image: linear-gradient(var(--accent), var(--accent)); background-repeat: no-repeat; background-size: 0% 88%; background-position: 0 70%; transition: background-size 1s cubic-bezier(.2,.75,.2,1); padding: 0 .06em; }
+  .statement.in mark { background-size: 100% 88%; }
+  .statement.in mark:nth-of-type(2) { transition-delay: .35s; }
+  .statement.in mark:nth-of-type(3) { transition-delay: .7s; }
+
+  /* Услуги — строки */
+  .svc { border-top: 1px solid var(--line); }
+  .svc-row { display: grid; gap: 10px 32px; padding: 30px 0; border-bottom: 1px solid var(--line); position: relative; text-decoration: none; isolation: isolate; }
+  .svc-row::before { content: ""; position: absolute; inset: 0 -16px; background: var(--ink); z-index: -1; transform: scaleY(0); transform-origin: bottom; transition: transform .45s cubic-bezier(.2,.75,.2,1); }
+  @media (min-width: 760px) { .svc-row::before { inset: 0 -32px; } }
+  @media (hover: hover) { .svc-row:hover { color: var(--paper); } .svc-row:hover::before { transform: scaleY(1); transform-origin: top; } .svc-row:hover .svc-price { color: var(--accent); } .svc-row:hover .svc-arr { transform: rotate(-45deg); color: var(--accent); } }
+  @media (min-width: 900px) { .svc-row { grid-template-columns: 60px 1.3fr 1fr 220px 40px; align-items: start; } }
+  .svc-n { font-size: 14px; opacity: .55; padding-top: 10px; }
+  .svc-name { font-size: clamp(28px, 3.4vw, 46px); letter-spacing: -.04em; line-height: 1; font-weight: 400; }
+  .svc-list { margin: 0; padding: 6px 0 0; list-style: none; font-size: 16px; }
+  .svc-list li::before { content: "— "; }
+  .svc-price { font-size: 16px; padding-top: 6px; transition: color .3s; }
+  .svc-price b { display: block; font-weight: 500; font-size: 22px; letter-spacing: -.02em; }
+  .svc-arr { font-size: 32px; line-height: 1; transition: transform .35s, color .3s; justify-self: end; display: none; }
+  @media (min-width: 900px) { .svc-arr { display: block; } }
+
+  /* Знакомо? */
+  .dark { background: var(--ink); color: var(--paper); }
+  .dark .head { border-color: var(--paper); }
+  .dark .head p { color: rgba(243,242,238,.6); }
+  .quotes { position: relative; min-height: 560px; }
+  .quote { position: absolute; max-width: 340px; padding: 18px 20px; background: var(--paper); color: var(--ink); font-size: 18px; line-height: 1.3; transform: rotate(var(--r)) translateY(30px); opacity: 0; transition: transform .8s cubic-bezier(.2,.75,.2,1), opacity .6s; transition-delay: var(--d); cursor: grab; touch-action: none; user-select: none; }
+  .quote small { display: block; margin-top: 10px; color: var(--ink-2); font-size: 13px; }
+  .quotes.in .quote { transform: rotate(var(--r)); opacity: 1; }
+  .quote.alt { background: var(--accent); }
+  .quote.dragging { transition: none; }
+  @media (max-width: 760px) {
+    .quotes { min-height: 0; display: grid; gap: 12px; }
+    .quote { position: static; max-width: none; cursor: default; }
+  }
+  .instead { display: grid; margin-top: 80px; border-top: 1px solid var(--paper); }
+  @media (min-width: 760px) { .instead { grid-template-columns: repeat(4, 1fr); } }
+  .instead div { padding: 24px 24px 24px 0; border-bottom: 1px solid rgba(243,242,238,.2); }
+  @media (min-width: 760px) { .instead div { border-bottom: 0; border-right: 1px solid rgba(243,242,238,.2); padding: 24px; } .instead div:first-child { padding-left: 0; } .instead div:last-child { border-right: 0; } }
+  .instead h3 { margin: 0 0 8px; font-weight: 500; font-size: 20px; letter-spacing: -.02em; }
+  .instead p { margin: 0; color: rgba(243,242,238,.65); font-size: 15px; }
+
+  /* Конструктор */
+  .builder { display: grid; gap: 48px; }
+  @media (min-width: 1000px) { .builder { grid-template-columns: 1.4fr 1fr; gap: 64px; } }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font: 400 clamp(17px, 1.8vw, 24px)/1 "Onest", sans-serif; letter-spacing: -.02em; padding: 15px 20px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; border-radius: 999px; transition: background .2s, color .2s, transform .2s; display: inline-flex; align-items: center; gap: 10px; }
+  .chip::before { content: "+"; transition: transform .3s; }
+  .chip:hover { background: var(--paper-2); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .chip[aria-pressed="true"]::before { transform: rotate(45deg); }
+  .chip:active { transform: scale(.97); }
+  .group-label { font-size: 13px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin: 30px 0 12px; }
+  .group-label:first-child { margin-top: 0; }
+  .result { border: 1px solid var(--ink); padding: 28px; align-self: start; background: var(--paper); }
+  @media (min-width: 1000px) { .result { position: sticky; top: 84px; } }
+  .result .lbl { font-size: 13px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; }
+  .result .sum { font-size: clamp(40px, 5vw, 72px); letter-spacing: -.05em; line-height: 1; margin: 10px 0 6px; font-weight: 400; }
+  .result .weeks { font-size: 20px; margin-bottom: 22px; }
+  .result ul { list-style: none; margin: 0 0 24px; padding: 16px 0 0; border-top: 1px solid var(--hair); font-size: 15px; min-height: 60px; }
+  .result li { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; }
+  .result li span:last-child { color: var(--ink-2); white-space: nowrap; }
+  .result .empty { color: var(--ink-2); }
+  .result .btn { width: 100%; justify-content: space-between; }
+  .result .fine { font-size: 13px; color: var(--ink-2); margin: 14px 0 0; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 160%); background: var(--ink); color: var(--paper); padding: 14px 20px; font-size: 15px; z-index: 40; transition: transform .4s cubic-bezier(.2,.75,.2,1), visibility 0s .4s; max-width: calc(100% - 32px); visibility: hidden; }
+  .toast.show { transform: translate(-50%, 0); visibility: visible; transition: transform .4s cubic-bezier(.2,.75,.2,1); }
+
+  /* Этапы */
+  .steps { display: grid; border-top: 1px solid var(--line); }
+  @media (min-width: 900px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  .step { padding: 24px 24px 32px 0; border-bottom: 1px solid var(--hair); }
+  @media (min-width: 900px) { .step { border-bottom: 0; border-right: 1px solid var(--hair); padding: 24px 24px 0; } .step:first-child { padding-left: 0; } .step:last-child { border-right: 0; } }
+  .step .n { font-size: clamp(56px, 7vw, 110px); font-weight: 300; letter-spacing: -.06em; line-height: 1; color: transparent; -webkit-text-stroke: 1px var(--ink); margin-bottom: 24px; }
+  .step h3 { font-weight: 500; font-size: 20px; margin: 0 0 8px; letter-spacing: -.02em; }
+  .step p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  /* Опыт — список */
+  .cases { border-top: 1px solid var(--line); }
+  .case { display: grid; gap: 12px 32px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+  @media (min-width: 900px) { .case { grid-template-columns: 1.2fr 1.4fr 180px; } }
+  .case h3 { margin: 0; font-weight: 400; font-size: clamp(26px, 2.8vw, 38px); letter-spacing: -.035em; line-height: 1.05; }
+  .case p { margin: 0; font-size: 16px; color: var(--ink-2); max-width: 560px; }
+  .case p b { color: var(--ink); font-weight: 500; }
+  .case .tag { font-size: 14px; justify-self: start; }
+  @media (min-width: 900px) { .case .tag { justify-self: end; } }
+  .case .tag span { border: 1px solid var(--ink); border-radius: 999px; padding: 6px 12px; display: inline-block; }
+
+  /* Вопросы */
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq details:first-child { border-top: 1px solid var(--line); }
+  .faq summary { list-style: none; cursor: pointer; padding: 24px 0; display: flex; justify-content: space-between; gap: 24px; font-size: clamp(20px, 2vw, 28px); letter-spacing: -.025em; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-weight: 300; font-size: 1.3em; line-height: .8; transition: transform .3s; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq p { margin: 0 0 28px; max-width: 760px; color: var(--ink-2); }
+
+  /* Финал */
+  .final { background: var(--accent); padding: 80px 0 32px; }
+  .final h2 { margin: 0; font-weight: 300; font-size: clamp(56px, 13vw, 220px); letter-spacing: -.07em; line-height: .85; }
+  .final-row { display: grid; gap: 32px; margin-top: 56px; align-items: end; }
+  @media (min-width: 900px) { .final-row { grid-template-columns: 1fr auto; } }
+  .final p { margin: 0; font-size: 20px; max-width: 520px; line-height: 1.35; }
+  .final .btn:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .contacts { display: grid; gap: 16px 40px; margin-top: 96px; padding-top: 18px; border-top: 1px solid var(--ink); font-size: 15px; }
+  @media (min-width: 760px) { .contacts { grid-template-columns: repeat(4, auto); justify-content: space-between; } }
+  .contacts span { color: rgba(17,17,17,.6); }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s cubic-bezier(.2,.75,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .wordmark span, .part, .reveal { opacity: 1 !important; transform: none !important; }
+    .quote { opacity: 1 !important; transform: rotate(var(--r)) !important; }
+    .statement mark { background-size: 100% 88%; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a href="#" class="mini-logo">сборка</a>
+    <nav class="links">
+      <a href="#services">Услуги</a>
+      <a href="#build" class="hide-sm">Собрать проект</a>
+      <a href="#process" class="hide-sm">Как работаем</a>
+      <a href="https://t.me/your_telegram">Telegram ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ПЕРВЫЙ ЭКРАН -->
+  <section class="hero" id="hero" style="padding-bottom: 0;">
+    <div class="wrap" style="width: 100%; display: flex; flex-direction: column; flex: 1;">
+      <h1 class="wordmark" id="wordmark" aria-label="сборка">сборка</h1>
+      <div class="tagline"><span>студия разработки</span><i></i><span>сайты и приложения</span></div>
+
+      <div class="hero-bottom">
+        <div>
+          <p>Собираем сайты, приложения для iOS и Android и Telegram-ботов. Цену и срок называем до начала работ, а не после.</p>
+          <a class="btn" href="https://t.me/your_telegram">Обсудить проект в Telegram <span class="arr">↗</span></a>
+        </div>
+        <div class="status"><b></b>Сейчас берём новые проекты</div>
+      </div>
+    </div>
+
+    <div class="parts" aria-hidden="true">
+      <div class="part" style="left:62%; top:20%; width:clamp(70px,11vw,170px); height:clamp(70px,11vw,170px); transform: rotate(-12deg);">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#ff4f1f"/><circle cx="50" cy="50" r="16" fill="#f3f2ee"/></svg>
+      </div>
+      <div class="part" style="left:22%; top:40%; width:clamp(90px,14vw,220px); height:clamp(54px,8.4vw,132px); transform: rotate(8deg);">
+        <svg viewBox="0 0 200 120"><circle cx="50" cy="20" r="18" fill="#111"/><circle cx="100" cy="20" r="18" fill="#111"/><circle cx="150" cy="20" r="18" fill="#111"/><rect y="20" width="200" height="100" rx="8" fill="#111"/></svg>
+      </div>
+      <div class="part" style="left:84%; top:46%; width:clamp(60px,8vw,130px); height:clamp(60px,8vw,130px); transform: rotate(20deg);">
+        <svg viewBox="0 0 100 100"><path d="M0 100 A100 100 0 0 1 100 0 L100 100 Z" fill="#111"/></svg>
+      </div>
+      <div class="part" style="left:47%; top:56%; width:clamp(46px,6vw,96px); height:clamp(46px,6vw,96px); transform: rotate(-4deg);">
+        <svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#ff4f1f"/></svg>
+      </div>
+    </div>
+    <div class="hint" id="hint" style="left: calc(62% + 20px); top: calc(20% + clamp(70px,11vw,170px) + 10px);">детали можно двигать</div>
+  </section>
+
+  <!-- ЗАЯВЛЕНИЕ -->
+  <section style="padding-bottom: 40px;">
+    <div class="wrap">
+      <p class="statement reveal">Мы небольшая команда разработчиков из крупных продуктов. Делаем так, чтобы у вас был <mark>работающий продукт</mark>, <mark>понятная смета</mark> и <mark>код, который принадлежит вам</mark>, а не подрядчику.</p>
+    </div>
+  </section>
+
+  <!-- УСЛУГИ -->
+  <section id="services">
+    <div class="wrap">
+      <div class="head reveal">
+        <h2>Что собираем</h2>
+        <p>Цены — ориентир для типовой задачи. Точную сумму фиксируем в договоре после созвона.</p>
+      </div>
+      <div class="svc">
+        <a class="svc-row reveal" href="https://t.me/your_telegram">
+          <span class="svc-n">01</span>
+          <span class="svc-name">Сайты и лендинги</span>
+          <ul class="svc-list"><li>Лендинг под рекламу</li><li>Сайт компании, каталог услуг</li><li>Формы заявок в Telegram и CRM</li></ul>
+          <span class="svc-price"><b>от 30 000 ₽</b>1–3 недели</span>
+          <span class="svc-arr">→</span>
+        </a>
+        <a class="svc-row reveal" href="https://t.me/your_telegram">
+          <span class="svc-n">02</span>
+          <span class="svc-name">Приложения для iOS и Android</span>
+          <ul class="svc-list"><li>MVP для проверки идеи</li><li>Нативно: Swift и Kotlin</li><li>Публикация в App Store, Google Play, RuStore</li></ul>
+          <span class="svc-price"><b>от 350 000 ₽</b>от 6 недель</span>
+          <span class="svc-arr">→</span>
+        </a>
+        <a class="svc-row reveal" href="https://t.me/your_telegram">
+          <span class="svc-n">03</span>
+          <span class="svc-name">Telegram-боты и Mini Apps</span>
+          <ul class="svc-list"><li>Заявки, запись, рассылки</li><li>Каталог и оплата внутри Telegram</li><li>Ассистент, который отвечает клиентам</li></ul>
+          <span class="svc-price"><b>от 40 000 ₽</b>1–4 недели</span>
+          <span class="svc-arr">→</span>
+        </a>
+        <a class="svc-row reveal" href="https://t.me/your_telegram">
+          <span class="svc-n">04</span>
+          <span class="svc-name">Доработка и поддержка</span>
+          <ul class="svc-list"><li>Аудит чужого кода</li><li>Новые функции в готовом продукте</li><li>Автотесты и стабильные релизы</li></ul>
+          <span class="svc-price"><b>от 20 000 ₽</b>в месяц</span>
+          <span class="svc-arr">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЗНАКОМО? -->
+  <section class="dark">
+    <div class="wrap">
+      <div class="head reveal">
+        <h2>Знакомо?</h2>
+        <p>Фразы, которые слышал почти каждый, кто заказывал разработку. Карточки можно растащить.</p>
+      </div>
+      <div class="quotes" id="quotes">
+        <div class="quote" style="--r:-3deg; --d:0s;   left:0%;  top:0;">«Мы почти закончили»<small>третий месяц подряд</small></div>
+        <div class="quote alt" style="--r:4deg; --d:.1s; left:30%; top:40px;">«Исходники? Это наша собственность»</div>
+        <div class="quote" style="--r:-6deg; --d:.2s; left:64%; top:10px;">«Адаптив под телефоны — это отдельная смета»</div>
+        <div class="quote" style="--r:2deg;  --d:.3s; left:6%;  top:200px;">«Разработчик ушёл, новый разберётся недели через две»</div>
+        <div class="quote" style="--r:-2deg; --d:.4s; left:44%; top:230px;">«Это не баг, это так задумано»</div>
+        <div class="quote alt" style="--r:5deg; --d:.5s; left:68%; top:300px;">«Сроки сдвигаются, но это в последний раз»</div>
+        <div class="quote" style="--r:-5deg; --d:.6s; left:18%; top:390px;">«Нужна предоплата 100%, так у всех»</div>
+      </div>
+      <div class="instead">
+        <div class="reveal"><h3>Цена в договоре</h3><p>Смета фиксируется до старта и не растёт по ходу работы.</p></div>
+        <div class="reveal"><h3>Демо каждую неделю</h3><p>Вы видите живой продукт, а не отчёт «всё идёт по плану».</p></div>
+        <div class="reveal"><h3>Оплата по этапам</h3><p>Платите за то, что уже работает. Без стопроцентной предоплаты.</p></div>
+        <div class="reveal"><h3>Всё оформлено на вас</h3><p>Репозиторий, хостинг и аккаунты в сторах с первого дня.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- КОНСТРУКТОР -->
+  <section id="build">
+    <div class="wrap">
+      <div class="head reveal">
+        <h2>Соберите проект</h2>
+        <p>Отметьте, что нужно, и сразу увидите ориентир по бюджету и срокам. Состав можно отправить нам в Telegram в один клик.</p>
+      </div>
+      <div class="builder">
+        <div class="reveal">
+          <div class="group-label">Сайт</div>
+          <div class="chips">
+            <button class="chip" data-id="landing" aria-pressed="false">Лендинг</button>
+            <button class="chip" data-id="corp" aria-pressed="false">Сайт компании</button>
+            <button class="chip" data-id="shop" aria-pressed="false">Интернет-магазин</button>
+          </div>
+          <div class="group-label">Приложение</div>
+          <div class="chips">
+            <button class="chip" data-id="ios" aria-pressed="false">iOS</button>
+            <button class="chip" data-id="android" aria-pressed="false">Android</button>
+          </div>
+          <div class="group-label">Telegram</div>
+          <div class="chips">
+            <button class="chip" data-id="bot" aria-pressed="false">Бот</button>
+            <button class="chip" data-id="miniapp" aria-pressed="false">Mini App</button>
+          </div>
+          <div class="group-label">Дополнительно</div>
+          <div class="chips">
+            <button class="chip" data-id="design" aria-pressed="false">Дизайн с нуля</button>
+            <button class="chip" data-id="ai" aria-pressed="false">Ответы клиентам с ИИ</button>
+            <button class="chip" data-id="crm" aria-pressed="false">Интеграция с CRM</button>
+            <button class="chip" data-id="pay" aria-pressed="false">Онлайн-оплата</button>
+          </div>
+        </div>
+
+        <div class="result reveal" aria-live="polite">
+          <div class="lbl">Ориентир</div>
+          <div class="sum" id="sum">—</div>
+          <div class="weeks" id="weeks">Выберите, что нужно собрать</div>
+          <ul id="list"><li class="empty">Пока пусто</li></ul>
+          <button class="btn" id="send">Отправить состав в Telegram <span class="arr">↗</span></button>
+          <p class="fine">Скопируем список в буфер обмена и откроем чат. Финальная цена — после созвона.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЭТАПЫ -->
+  <section id="process" style="padding-top: 0;">
+    <div class="wrap">
+      <div class="head reveal">
+        <h2>Как работаем</h2>
+        <p>Четыре шага от первого сообщения до запуска.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><div class="n">01</div><h3>Созвон на 20 минут</h3><p>Разбираемся в задаче. Бесплатно и ни к чему не обязывает.</p></div>
+        <div class="step reveal"><div class="n">02</div><h3>Смета и план</h3><p>Через 1–2 дня присылаем объём работ, цену и сроки по этапам.</p></div>
+        <div class="step reveal"><div class="n">03</div><h3>Разработка</h3><p>Каждую неделю показываем, что готово. Оплата — за каждый этап.</p></div>
+        <div class="step reveal"><div class="n">04</div><h3>Запуск</h3><p>Публикуем, передаём доступы и 30 дней бесплатно исправляем ошибки.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ОПЫТ -->
+  <!-- TODO: заменить на реальные кейсы, лучше с цифрами -->
+  <section style="padding-top: 0;">
+    <div class="wrap">
+      <div class="head reveal">
+        <h2>Откуда опыт</h2>
+        <p>Работаем в продуктах, где ошибка в релизе стоит дорого. Тот же подход — в проектах для клиентов.</p>
+      </div>
+      <div class="cases">
+        <div class="case reveal"><h3>Приложение федерального масштаба</h3><p>Разработка фич на Swift, UI-автотесты, интеграции с API и аналитикой. <b>Ключевые сценарии покрыты автотестами, релизы выходят без регрессий.</b></p><div class="tag"><span>iOS</span></div></div>
+        <div class="case reveal"><h3>ИИ-инструменты для команды</h3><p>Интеграции, через которые ИИ работает с трекером задач, базами, логами и мессенджерами. <b>Рутина, на которую уходил час, делается одной командой.</b></p><div class="tag"><span>Автоматизация</span></div></div>
+        <div class="case reveal"><h3>Сценарии в n8n</h3><p>События из разных систем собираются, обрабатываются и приходят в Telegram. <b>Данные больше не пересылают руками.</b></p><div class="tag"><span>Интеграции</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВОПРОСЫ -->
+  <section style="padding-top: 0;">
+    <div class="wrap">
+      <div class="head reveal"><h2>Вопросы</h2><p>Если вашего вопроса нет — напишите, ответим в течение пары часов.</p></div>
+      <div class="faq reveal">
+        <details><summary>У меня только идея, без ТЗ. Это нормально?</summary><p>Да, так начинается большинство проектов. Разберёмся на созвоне, техническое задание составим сами и согласуем с вами.</p></details>
+        <details><summary>Что выбрать: сайт, приложение или бота?</summary><p>Сайт нужен, чтобы получать заявки из рекламы и поиска. Если клиенты уже пишут вам в Telegram, часто хватает бота или Mini App — это быстрее и дешевле. Приложение имеет смысл, когда важны push-уведомления, офлайн-режим или постоянная работа с продуктом. Подскажем честно, даже если выйдет дешевле.</p></details>
+        <details><summary>Можно сразу под iOS и Android?</summary><p>Да. Можно запустить обе платформы одновременно или начать с одной, проверить спрос и добавить вторую позже.</p></details>
+        <details><summary>Возьмёте проект, который делал кто-то другой?</summary><p>Возьмём. Сначала проведём короткий аудит кода и скажем, что выгоднее: дорабатывать или переписать.</p></details>
+        <details><summary>Как устроена оплата?</summary><p>Предоплата за первый этап, дальше — за каждый готовый этап. Работаем по договору с закрывающими документами.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ФИНАЛ -->
+  <section class="final">
+    <div class="wrap">
+      <h2 class="reveal">Соберём<br>ваш проект?</h2>
+      <div class="final-row">
+        <p>Напишите пару строк о задаче — предложим решение, срок и цену. Если задача не наша, скажем сразу.</p>
+        <a class="btn" href="https://t.me/your_telegram">Написать в Telegram <span class="arr">↗</span></a>
+      </div>
+      <div class="contacts">
+        <div><span>Telegram</span><br><a href="https://t.me/your_telegram">@your_telegram</a></div>
+        <div><span>Почта</span><br><a href="mailto:hello@example.com">hello@example.com</a></div>
+        <div><span>Формат</span><br>Удалённо, по всей России</div>
+        <div><span>©</span><br>сборка, 2026</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  var TG_USERNAME = "your_telegram";
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Буквы логотипа */
+  var wm = document.getElementById("wordmark");
+  wm.innerHTML = wm.textContent.split("").map(function (ch, i) { return '<span aria-hidden="true" style="--i:' + i + '">' + ch + "</span>"; }).join("");
+  // подгоняем надпись точно под ширину контейнера
+  function fitWordmark() {
+    var box = wm.parentElement, cs = getComputedStyle(box);
+    var avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    wm.style.fontSize = "100px";
+    var s = wm.children, w = s[s.length - 1].getBoundingClientRect().right - s[0].getBoundingClientRect().left;
+    wm.style.fontSize = Math.min(100 * avail / w * 0.99, 420) + "px";
+  }
+  fitWordmark();
+  addEventListener("resize", fitWordmark);
+  if (document.fonts) document.fonts.ready.then(fitWordmark);
+  setTimeout(function () { document.body.classList.add("loaded"); }, 80);
+
+  /* Шапка: фон после первого экрана, прячется при скролле вниз */
+  var top = document.getElementById("top"), lastY = 0;
+  addEventListener("scroll", function () {
+    var y = scrollY;
+    top.classList.toggle("solid", y > innerHeight * .6);
+    top.classList.toggle("hide", y > innerHeight && y > lastY);
+    lastY = y;
+  }, { passive: true });
+
+  /* Появление при скролле */
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: .15 });
+  document.querySelectorAll(".reveal, .quotes").forEach(function (el) { io.observe(el); });
+
+  /* Перетаскивание: детали на первом экране и карточки с цитатами */
+  var hint = document.getElementById("hint"), z = 10;
+  function draggable(el, onStart) {
+    var sx, sy, ox, oy, dragging = false;
+    el.addEventListener("pointerdown", function (e) {
+      if (getComputedStyle(el).position === "static") return;
+      dragging = true; el.setPointerCapture(e.pointerId); el.classList.add("dragging");
+      sx = e.clientX; sy = e.clientY; ox = el.offsetLeft; oy = el.offsetTop;
+      el.style.zIndex = ++z;
+      if (onStart) onStart();
+    });
+    el.addEventListener("pointermove", function (e) {
+      if (!dragging) return;
+      el.style.left = ox + e.clientX - sx + "px"; el.style.top = oy + e.clientY - sy + "px";
+    });
+    function end() { dragging = false; el.classList.remove("dragging"); }
+    el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+  }
+  document.querySelectorAll(".part").forEach(function (p) { draggable(p, function () { hint.style.opacity = 0; }); });
+  document.querySelectorAll(".quote").forEach(function (q) { draggable(q); });
+
+  /* Конструктор проекта: ориентиры цен и сроков */
+  var ITEMS = {
+    landing: { name: "Лендинг", price: 30000, weeks: 1 },
+    corp:    { name: "Сайт компании", price: 60000, weeks: 3 },
+    shop:    { name: "Интернет-магазин", price: 150000, weeks: 5 },
+    ios:     { name: "Приложение iOS", price: 350000, weeks: 6 },
+    android: { name: "Приложение Android", price: 320000, weeks: 6 },
+    bot:     { name: "Telegram-бот", price: 40000, weeks: 2 },
+    miniapp: { name: "Telegram Mini App", price: 120000, weeks: 4 },
+    design:  { name: "Дизайн с нуля", price: 40000, weeks: 1 },
+    ai:      { name: "Ответы клиентам с ИИ", price: 30000, weeks: 1 },
+    crm:     { name: "Интеграция с CRM", price: 25000, weeks: 1 },
+    pay:     { name: "Онлайн-оплата", price: 20000, weeks: 1 }
+  };
+  var picked = [];
+  var sumEl = document.getElementById("sum"), weeksEl = document.getElementById("weeks"), listEl = document.getElementById("list");
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+  function setSum(to) {
+    var from = +(sumEl.dataset.v || 0), t0 = performance.now();
+    sumEl.dataset.v = to;
+    if (!to) { sumEl.textContent = "—"; return; }
+    if (reduce) { sumEl.textContent = "от " + fmt(to) + " ₽"; return; }
+    (function step(now) {
+      var p = Math.min((now - t0) / 500, 1), e = 1 - Math.pow(1 - p, 3);
+      sumEl.textContent = "от " + fmt(Math.round((from + (to - from) * e) / 1000) * 1000) + " ₽";
+      if (p < 1 && +sumEl.dataset.v === to) requestAnimationFrame(step);
+    })(t0);
+  }
+  function weeksWord(n) { var m = n % 10, h = n % 100; return (m === 1 && h !== 11) ? "неделя" : (m >= 2 && m <= 4 && (h < 12 || h > 14)) ? "недели" : "недель"; }
+  function update() {
+    var total = 0, weeks = picked.map(function (id) { total += ITEMS[id].price; return ITEMS[id].weeks; }).sort(function (a, b) { return b - a; });
+    // обе платформы сразу: часть работы общая
+    if (picked.indexOf("ios") > -1 && picked.indexOf("android") > -1) total -= 80000;
+    var w = weeks.length ? weeks[0] + Math.ceil(weeks.slice(1).reduce(function (s, x) { return s + x; }, 0) * .35) : 0;
+    setSum(total);
+    weeksEl.textContent = picked.length ? "срок около " + w + " " + weeksWord(w) : "Выберите, что нужно собрать";
+    listEl.innerHTML = picked.length ? picked.map(function (id) { return "<li><span>" + ITEMS[id].name + "</span><span>от " + fmt(ITEMS[id].price) + " ₽</span></li>"; }).join("") : '<li class="empty">Пока пусто</li>';
+  }
+  document.querySelectorAll(".chip").forEach(function (c) {
+    c.addEventListener("click", function () {
+      var id = c.dataset.id, on = c.getAttribute("aria-pressed") !== "true";
+      c.setAttribute("aria-pressed", String(on));
+      if (on) picked.push(id); else picked.splice(picked.indexOf(id), 1);
+      update();
+    });
+  });
+
+  var toast = document.getElementById("toast"), tt;
+  function say(text) { toast.textContent = text; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove("show"); }, 3500); }
+  document.getElementById("send").addEventListener("click", function () {
+    var text = picked.length
+      ? "Здравствуйте! Хочу обсудить проект:\n" + picked.map(function (id) { return "— " + ITEMS[id].name; }).join("\n") + "\nОриентир с сайта: " + sumEl.textContent + ", " + weeksEl.textContent + "."
+      : "Здравствуйте! Хочу обсудить проект.";
+    function open() { window.open("https://t.me/" + TG_USERNAME, "_blank"); }
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { say("Состав проекта скопирован — вставьте его в чат"); setTimeout(open, 700); }, open);
+    else open();
+  });
+})();
+</script>
+</body>
+</html>
